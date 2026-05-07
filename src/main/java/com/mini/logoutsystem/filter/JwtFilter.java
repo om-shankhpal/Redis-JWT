@@ -47,17 +47,15 @@ public class JwtFilter extends OncePerRequestFilter {
                 String token = authHeader.substring(7);
                 logger.debug("Token extracted, length: {}", token.length());
 
-                // Check if token is blacklisted
                 try {
                     if (blacklistService.isBlacklisted(token)) {
-                        logger.warn("❌ Token is BLACKLISTED");
+                        logger.warn("Token is BLACKLISTED");
                         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                         return;
                     }
                     logger.debug("✓ Token is not blacklisted");
                 } catch (Exception e) {
-                    logger.error("⚠️  Error checking blacklist (Redis issue?): {}", e.getMessage());
-                    // Continue anyway - don't block if Redis is down
+                    logger.error("Error checking blacklist (Redis issue?): {}", e.getMessage());
                 }
 
                 if (jwtUtil.validateToken(token)) {
@@ -75,7 +73,7 @@ public class JwtFilter extends OncePerRequestFilter {
                     logger.info("✓ Authentication set in SecurityContext for user: {}", username);
 
                 } else {
-                    logger.warn("❌ Token validation FAILED");
+                    logger.warn("Token validation FAILED");
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     return;
                 }
@@ -83,7 +81,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 logger.info("✓ Public endpoint, no auth required: {}", uri);
             }
         } catch (Exception e) {
-            logger.error("❌ Exception in JWT filter: {}", e.getMessage(), e);
+            logger.error("Exception in JWT filter: {}", e.getMessage(), e);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
